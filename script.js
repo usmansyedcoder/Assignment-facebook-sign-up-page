@@ -1,47 +1,68 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('signupForm');
+    const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
-    const passwordStrength = document.getElementById('passwordStrength');
-    const submitBtn = document.getElementById('submitBtn');
+    const birthdateInput = document.getElementById('birthdate');
+    const calendarBtn = document.querySelector('.calendar-btn');
     
-    // Password strength checker
-    passwordInput.addEventListener('input', function() {
-        const password = passwordInput.value;
-        let strength = 'weak';
+    // Toggle password visibility
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+    
+    // Format birthdate input
+    birthdateInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
         
-        if (password.length >= 12) {
-            strength = 'strong';
-        } else if (password.length >= 8) {
-            strength = 'medium';
+        if (value.length > 8) {
+            value = value.substring(0, 8);
         }
         
-        passwordStrength.className = 'strength-bar';
-        passwordStrength.classList.add(`strength-${strength}`);
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2);
+        }
+        if (value.length >= 5) {
+            value = value.substring(0, 5) + '/' + value.substring(5);
+        }
+        
+        e.target.value = value;
+    });
+    
+    // Calendar button click
+    calendarBtn.addEventListener('click', function() {
+        birthdateInput.focus();
+        // Show date picker
+        birthdateInput.showPicker ? birthdateInput.showPicker() : birthdateInput.type = 'date';
+        setTimeout(() => {
+            birthdateInput.type = 'text';
+        }, 100);
     });
     
     // Form validation
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Reset all errors
-        document.querySelectorAll('.error-message').forEach(msg => msg.style.display = 'none');
-        document.querySelectorAll('.input-group').forEach(group => group.classList.remove('error'));
+        // Clear previous errors
+        document.querySelectorAll('.input-group').forEach(group => {
+            group.classList.remove('error');
+        });
         
         let isValid = true;
         
         // Validate first name
         const firstName = document.getElementById('firstName').value.trim();
         if (firstName.length < 2) {
-            document.getElementById('firstNameError').style.display = 'block';
-            document.getElementById('firstName').parentElement.classList.add('error');
+            showError('firstName', 'First name must be at least 2 characters');
             isValid = false;
         }
         
         // Validate last name
         const lastName = document.getElementById('lastName').value.trim();
         if (lastName.length < 2) {
-            document.getElementById('lastNameError').style.display = 'block';
-            document.getElementById('lastName').parentElement.classList.add('error');
+            showError('lastName', 'Last name must be at least 2 characters');
             isValid = false;
         }
         
@@ -49,70 +70,84 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = document.getElementById('email').value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            document.getElementById('emailError').style.display = 'block';
-            document.getElementById('email').parentElement.classList.add('error');
+            showError('email', 'Please enter a valid email address');
             isValid = false;
         }
         
         // Validate password
         const password = passwordInput.value;
         if (password.length < 8) {
-            document.getElementById('passwordError').style.display = 'block';
-            passwordInput.parentElement.classList.add('error');
+            showError('password', 'Password must be at least 8 characters');
             isValid = false;
         }
         
-        // Validate birthdate (must be at least 13 years old)
-        const birthdate = new Date(document.getElementById('birthdate').value);
-        const today = new Date();
-        const minDate = new Date();
-        minDate.setFullYear(today.getFullYear() - 13);
-        
-        if (birthdate > minDate) {
-            document.getElementById('birthdateError').style.display = 'block';
-            document.getElementById('birthdate').parentElement.classList.add('error');
+        // Validate birthdate
+        const birthdate = birthdateInput.value;
+        const birthdateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+        if (!birthdateRegex.test(birthdate)) {
+            showError('birthdate', 'Please enter a valid date (MM/DD/YYYY)');
             isValid = false;
         }
         
-        // Validate gender
-        const gender = document.getElementById('gender').value;
-        if (!gender) {
-            document.getElementById('genderError').style.display = 'block';
-            document.getElementById('gender').parentElement.classList.add('error');
+        // Validate terms
+        const terms = document.getElementById('terms').checked;
+        if (!terms) {
+            alert('Please agree to the Terms of Service and Privacy Policy');
             isValid = false;
         }
         
-        // If valid, show success message
         if (isValid) {
+            // Show loading state
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             submitBtn.disabled = true;
-            submitBtn.value = 'Creating Account...';
             
             // Simulate API call
             setTimeout(() => {
-                document.getElementById('successMessage').style.display = 'block';
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'success-message';
+                successMsg.innerHTML = 'Account created successfully! Redirecting...';
+                form.insertBefore(successMsg, form.querySelector('.submit-btn'));
                 
                 // Reset form after 3 seconds
                 setTimeout(() => {
                     form.reset();
-                    document.getElementById('successMessage').style.display = 'none';
+                    successMsg.remove();
+                    submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
-                    submitBtn.value = 'Sign Up';
-                    passwordStrength.className = 'strength-bar';
                     
-                    alert('Account created successfully! (This is a demo)');
+                    // Show welcome alert
+                    alert('Welcome! Your account has been created successfully.');
                 }, 3000);
             }, 2000);
         }
     });
     
-    // Set max date for birthdate (13 years ago)
-    const today = new Date();
-    const maxDate = new Date();
-    maxDate.setFullYear(today.getFullYear() - 13);
-    document.getElementById('birthdate').max = maxDate.toISOString().split('T')[0];
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const inputGroup = field.closest('.input-group');
+        inputGroup.classList.add('error');
+        
+        // Remove existing error message
+        const existingError = inputGroup.querySelector('.error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Add new error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'error-message';
+        errorMsg.textContent = message;
+        inputGroup.appendChild(errorMsg);
+    }
     
-    // Set placeholder date (18 years ago)
-    const placeholderDate = new Date();
-    placeholderDate.setFullYear(today.getFullYear() - 18);
-    document.getElementById('birthdate').value = placeholderDate.toISOString().split('T')[0];
+    // Social login buttons
+    document.querySelectorAll('.social-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const platform = this.classList.contains('google') ? 'Google' : 'Facebook';
+            alert(`Redirecting to ${platform} login...`);
+        });
+    });
 });
