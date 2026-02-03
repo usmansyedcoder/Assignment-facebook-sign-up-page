@@ -8,38 +8,78 @@
 </head>
 <body>
     <div class="container">
+        <div class="facebook-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+                <path d="M20.181 35.87C29.094 34.791 36 27.202 36 18c0-9.941-8.059-18-18-18S0 8.059 0 18c0 8.442 5.811 15.526 13.652 17.471L14 34h5.5l.681 1.87Z"/>
+                <path fill="#FFF" d="M13.651 35.471v-11.97H9.936V18h3.715v-2.37c0-6.127 2.772-8.964 8.784-8.964 1.138 0 3.103.223 3.91.446v4.983c-.425-.043-1.167-.065-2.081-.065-2.952 0-4.09 1.116-4.09 4.025V18h5.883l-1.008 5.5h-4.867v12.37a18.183 18.183 0 0 1-6.53-.399Z"/>
+            </svg>
+        </div>
+        
         <div class="signup-form">
             <h1>Sign Up</h1>
-            <form action="#" method="post">
-                <div class="input-group">
-                    <input type="text" name="firstname" placeholder="First Name" required>
-</div>
- <div class="input-group">
-                    <input type="text" name="lastname" placeholder="Last Name" required>
+            <p class="subtitle">It's quick and easy.</p>
+            
+            <div class="success-message" id="successMessage">
+                Account created successfully! Redirecting...
+            </div>
+            
+            <form action="#" method="post" id="signupForm">
+                <div class="name-fields">
+                    <div class="input-group">
+                        <input type="text" name="firstname" placeholder="First Name" required id="firstName">
+                        <div class="error-message" id="firstNameError">Please enter a valid first name</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" name="lastname" placeholder="Last Name" required id="lastName">
+                        <div class="error-message" id="lastNameError">Please enter a valid last name</div>
+                    </div>
                 </div>
+                
                 <div class="input-group">
-                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="email" name="email" placeholder="Email" required id="email">
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
                 </div>
+                
                 <div class="input-group">
-                    <input type="password" name="password" placeholder="Password" required>
+                    <input type="password" name="password" placeholder="New Password" required id="password">
+                    <div class="password-strength">
+                        <div class="strength-bar" id="passwordStrength"></div>
+                    </div>
+                    <div class="error-message" id="passwordError">Password must be at least 8 characters</div>
                 </div>
+                
                 <div class="input-group">
                     <label for="birthdate">Birthdate:</label>
-                    <input type="date" id="birthdate" name="birthdate" required>
+                    <input type="date" id="birthdate" name="birthdate" required max="2024-12-31">
+                    <div class="error-message" id="birthdateError">You must be at least 13 years old</div>
                 </div>
+                
                 <div class="input-group">
                     <label for="gender">Gender:</label>
                     <select id="gender" name="gender" required>
+                        <option value="" disabled selected>Select gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                         <option value="other">Other</option>
                     </select>
+                    <div class="error-message" id="genderError">Please select your gender</div>
                 </div>
+                
+                <div class="terms">
+                    <p>By clicking Sign Up, you agree to our <a href="#">Terms</a>, <a href="#">Data Policy</a> and <a href="#">Cookie Policy</a>.</p>
+                </div>
+                
                 <div class="input-group">
-                    <input type="submit" value="Sign Up">
+                    <input type="submit" value="Sign Up" id="submitBtn">
                 </div>
             </form>
+            
+            <div class="login-link">
+                <p>Already have an account? <a href="#">Log in</a></p>
+            </div>
         </div>
     </div>
+    
+    <script src="script.js"></script>
 </body>
 </html>
